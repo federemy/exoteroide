@@ -1,7 +1,8 @@
 import { defineConfig } from 'astro/config';
+import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: '@astrojs/netlify', // Solo necesitas poner el nombre del paquete
+  adapter: netlify(),
 });
