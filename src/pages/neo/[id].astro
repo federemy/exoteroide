@@ -1,19 +1,23 @@
 ---
-// src/pages/neo/[id].astro
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { NEODetail } from '../../components/NEODetail.jsx';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { NEODetail } from "../../components/NEODetail.jsx";
 
-// **¡Solución al problema!**
-export const prerender = false;
+// 👇 Aquí definís qué IDs querés generar como páginas estáticas
+export async function getStaticPaths() {
+  // Ejemplo: IDs fijos o cargados desde un JSON/CSV
+  const ids = ["1", "2", "3"]; 
 
-const { id } = Astro.params;
-
-if (!id) {
-    return Astro.redirect('/');
+  return ids.map(id => ({
+    params: { id }
+  }));
 }
+
+// 👇 Astro.params.id se llena con cada valor de arriba
+const { id } = Astro.params;
 ---
+
 <BaseLayout title={`Detalle del NEO ${id}`}>
-    <main>
-        <NEODetail neoId={id} client:load />
-    </main>
+  <main>
+    <NEODetail neoId={id} client:load />
+  </main>
 </BaseLayout>

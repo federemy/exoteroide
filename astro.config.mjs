@@ -1,6 +1,8 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
 
-// https://astro.build/config
 export default defineConfig({
-  output: 'static',
+  output: "static",       // 👈 solo estático
+  outDir: "dist",         // 👈 carpeta de salida
+  integrations: [react()] // 👈 soporte para React
 });
