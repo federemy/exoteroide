@@ -1,0 +1,19 @@
+---
+// src/pages/neo/[id].astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { NEODetail } from '../../components/NEODetail.jsx';
+
+// **¡Solución al problema!**
+export const prerender = false;
+
+const { id } = Astro.params;
+
+if (!id) {
+    return Astro.redirect('/');
+}
+---
+<BaseLayout title={`Detalle del NEO ${id}`}>
+    <main>
+        <NEODetail neoId={id} client:load />
+    </main>
+</BaseLayout>
