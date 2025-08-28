@@ -22,9 +22,6 @@ export function Header() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="/info/peligrosidad" className="text-light">
-              ¿Por qué son peligrosos?
-            </Nav.Link>
             <Nav.Link href="/exoplanetas" className="text-light">
               Exoplanetas
             </Nav.Link>

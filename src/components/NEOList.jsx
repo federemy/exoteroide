@@ -1,3 +1,4 @@
+// src/components/NEOList.jsx
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -10,6 +11,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { DiameterChart } from "./DiameterChart.jsx";
+import { NEOModal } from "./NEOModal.jsx";
 
 // Distancia media de la Tierra a la Luna en kilómetros
 const EARTH_MOON_DISTANCE_KM = 384400;
@@ -38,6 +40,10 @@ export function NEOList() {
   const [sortBy, setSortBy] = useState("distance");
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(12);
+
+  // Estado para el modal
+  const [showModal, setShowModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const URL = `https://api.nasa.gov/neo/rest/v1/feed?start_date=${START_DATE}&end_date=${END_DATE}&api_key=${API_KEY}`;
@@ -122,6 +128,12 @@ export function NEOList() {
     return `${avg} km (aprox.)`;
   };
 
+  // --- Abrir modal ---
+  const openDetail = (id) => {
+    setSelectedId(id);
+    setShowModal(true);
+  };
+
   return (
     <Container className="my-5">
       <h1 className="text-center mb-4 text-warning">
@@ -165,7 +177,6 @@ export function NEOList() {
           {/* Filtro de Peligrosidad */}
           <Button
             variant={showHazardousOnly ? "danger" : "outline-danger"}
-            // Corrected the typo "Hazardary" to "Hazardous"
             onClick={() => setShowHazardousOnly(!showHazardousOnly)}
             className="py-2 px-3 fw-bold"
           >
@@ -182,87 +193,86 @@ export function NEOList() {
       <Row xs={1} md={2} lg={3} className="g-4">
         {neosToDisplay.map((neo) => (
           <Col key={neo.id}>
-            <a href={`/neo/${neo.id}`} className="text-decoration-none">
-              <Card
-                bg="dark"
-                text="light"
-                className={`h-100 shadow hover-scale border ${
+            <Card
+              bg="dark"
+              text="light"
+              className={`h-100 shadow hover-scale border ${
+                neo.is_potentially_hazardous_asteroid
+                  ? "border-danger"
+                  : "border-warning"
+              }`}
+              style={{ cursor: "pointer" }}
+              onClick={() => openDetail(neo.id)}
+            >
+              <Card.Header
+                className={
                   neo.is_potentially_hazardous_asteroid
-                    ? "border-danger"
-                    : "border-warning"
-                }`}
-                style={{ cursor: "pointer" }}
+                    ? "bg-danger text-light fw-bold"
+                    : "bg-warning text-dark fw-bold"
+                }
               >
-                <Card.Header
-                  className={
-                    neo.is_potentially_hazardous_asteroid
-                      ? "bg-danger text-light fw-bold"
-                      : "bg-warning text-dark fw-bold"
-                  }
-                >
-                  {neo.name}
-                </Card.Header>
-                <Card.Body>
-                  <ul className="list-unstyled small mt-2">
-                    <li>
-                      **ID:** <span className="text-muted">{neo.id}</span>
-                    </li>
-                    <li>
-                      **Peligro:**{" "}
-                      <span
-                        className={
-                          neo.is_potentially_hazardous_asteroid
-                            ? "text-danger fw-bold"
-                            : "text-success"
-                        }
-                      >
-                        {neo.is_potentially_hazardous_asteroid ? "SÍ" : "No"}
-                      </span>
-                    </li>
-                    <li>
-                      **Diámetro:**{" "}
-                      <span className="text-primary">
-                        {formatDiameter(
-                          neo.estimated_diameter.kilometers
-                            .estimated_diameter_min,
-                          neo.estimated_diameter.kilometers
-                            .estimated_diameter_max
-                        )}
-                      </span>
-                    </li>
-                    <li>
-                      **Aprox. Más Cercana:**{" "}
-                      <span className="text-light">
-                        {neo.close_approach_data[0].close_approach_date}
-                      </span>
-                    </li>
-                    <li>
-                      **Distancia (km):**{" "}
-                      <span className="text-light">
-                        {parseInt(
+                {neo.name}
+              </Card.Header>
+              <Card.Body>
+                <ul className="list-unstyled small mt-2">
+                  <li>
+                    <strong>ID:</strong>{" "}
+                    <span className="text-muted">{neo.id}</span>
+                  </li>
+                  <li>
+                    <strong>Peligro:</strong>{" "}
+                    <span
+                      className={
+                        neo.is_potentially_hazardous_asteroid
+                          ? "text-danger fw-bold"
+                          : "text-success"
+                      }
+                    >
+                      {neo.is_potentially_hazardous_asteroid ? "SÍ" : "No"}
+                    </span>
+                  </li>
+                  <li>
+                    <strong>Diámetro:</strong>{" "}
+                    <span className="text-primary">
+                      {formatDiameter(
+                        neo.estimated_diameter.kilometers
+                          .estimated_diameter_min,
+                        neo.estimated_diameter.kilometers.estimated_diameter_max
+                      )}
+                    </span>
+                  </li>
+                  <li>
+                    <strong>Aprox. Más Cercana:</strong>{" "}
+                    <span className="text-light">
+                      {neo.close_approach_data[0].close_approach_date}
+                    </span>
+                  </li>
+                  <li>
+                    <strong>Distancia (km):</strong>{" "}
+                    <span className="text-light">
+                      {parseInt(
+                        neo.close_approach_data[0].miss_distance.kilometers
+                      ).toLocaleString()}{" "}
+                      km
+                    </span>
+                  </li>
+                  <li className="mt-3">
+                    <strong>Referencia:</strong>{" "}
+                    <span className="text-warning fw-bold">
+                      {(
+                        parseFloat(
                           neo.close_approach_data[0].miss_distance.kilometers
-                        ).toLocaleString()}{" "}
-                        km
-                      </span>
-                    </li>
-                    <li className="mt-3">
-                      **Referencia:**{" "}
-                      <span className="text-warning fw-bold">
-                        {(
-                          parseFloat(
-                            neo.close_approach_data[0].miss_distance.kilometers
-                          ) / EARTH_MOON_DISTANCE_KM
-                        ).toFixed(2)}{" "}
-                        distancias lunares
-                      </span>
-                    </li>
-                  </ul>
-                </Card.Body>
-                <Card.Footer className="text-muted small text-center">
-                  Click para ver más detalles
-                </Card.Footer>
-              </Card>
-            </a>
+                        ) / EARTH_MOON_DISTANCE_KM
+                      ).toFixed(2)}{" "}
+                      distancias lunares
+                    </span>
+                  </li>
+                </ul>
+              </Card.Body>
+              <Card.Footer className="text-muted small text-center">
+                Click para ver más detalles
+              </Card.Footer>
+            </Card>
           </Col>
         ))}
       </Row>
@@ -281,6 +291,13 @@ export function NEOList() {
           </Button>
         </div>
       )}
+
+      {/* Modal con detalles */}
+      <NEOModal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        neoId={selectedId}
+      />
     </Container>
   );
 }
