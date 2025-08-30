@@ -195,27 +195,54 @@ export function NEODetail({ neoId: neoIdProp }) {
             ⚠️ ¿Por qué este asteroide es considerado "Peligroso"?
           </Card.Header>
           <Card.Body>
-            <p>
-              Este asteroide ha sido clasificado como{" "}
-              <strong>Potencialmente Peligroso (PHA)</strong> porque cumple con
-              una combinación de criterios de <strong>tamaño</strong> y{" "}
-              <strong>distancia</strong> establecidos por la NASA.
-            </p>
-            <ul className="list-unstyled">
-              <li>
-                <strong className="text-danger">1. Tamaño:</strong> Se estima
-                que su diámetro es superior a los <strong>150 metros</strong>.
-              </li>
-              <li>
-                <strong className="text-danger">2. Distancia:</strong> Su órbita
-                se acerca a menos de <strong>7.5 millones de kilómetros</strong>
-                de la órbita de la Tierra.
-              </li>
-            </ul>
-            <p className="mb-0">
-              Esta clasificación no implica un riesgo inminente; es una
-              designación para seguimiento continuo.
-            </p>
+            <div className="space-y-4 text-light">
+              <p>
+                🪐 <strong>{neo.name}</strong> es un asteroide que forma parte
+                del grupo de objetos cercanos a la Tierra (NEO). Estos cuerpos
+                rocosos 🪨 viajan por el sistema solar y, a veces, se acercan
+                bastante a nuestro planeta 🌍.
+              </p>
+
+              <p>
+                📏 Su tamaño máximo estimado es de{" "}
+                <strong>{diameterMaxPretty} metros</strong>, lo que lo convierte
+                en un objeto bastante considerable. Para que te des una idea,
+                ¡eso puede ser más alto que la Torre de Pisa! 🏛️
+              </p>
+
+              <p>
+                🚀 En su última aproximación registrada, este asteroide pasó a{" "}
+                <strong>{missKmPretty} km</strong> de la Tierra viajando a{" "}
+                <strong>{relVelPretty} km/s</strong> — ¡más rápido que una bala!
+                💥
+              </p>
+
+              <p>
+                🔄 Su trayectoria lo lleva a orbitar alrededor de{" "}
+                <strong>{approachData?.orbiting_body || "—"}</strong>, y es
+                monitoreado regularmente por la NASA para detectar cualquier
+                cambio.
+              </p>
+
+              <p>
+                🧪 Este objeto tiene el ID oficial de la NASA{" "}
+                <strong>{neo.id}</strong> y podés ver su trayectoria completa en
+                el sitio oficial:
+              </p>
+
+              <div className="text-center">
+                {neo.nasa_jpl_url && (
+                  <a
+                    href={neo.nasa_jpl_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline-warning mt-2"
+                  >
+                    🌐 Ver Órbita en NASA JPL
+                  </a>
+                )}
+              </div>
+            </div>
           </Card.Body>
         </Card>
       )}

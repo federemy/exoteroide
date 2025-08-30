@@ -316,7 +316,12 @@ export function ExoplanetList() {
       </Card>
 
       {/* Modal para mostrar los detalles del planeta */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+      <Modal
+        show={showModal}
+        size="lg"
+        onHide={() => setShowModal(false)}
+        centered
+      >
         <Modal.Header
           closeButton
           className="bg-dark text-light border-secondary"
@@ -327,75 +332,132 @@ export function ExoplanetList() {
           {selectedPlanet ? (
             <>
               <p>
-                <strong>Estrella:</strong> {selectedPlanet.hostname}
+                🌌 <strong>{selectedPlanet.pl_name}</strong> es un exoplaneta
+                que orbita la estrella{" "}
+                <strong>{selectedPlanet.hostname}</strong>.
               </p>
+
               <p>
-                <strong>Método de Descubrimiento:</strong>{" "}
-                {selectedPlanet.discoverymethod}
+                🔭 Fue descubierto en el año{" "}
+                <strong>{selectedPlanet.disc_year}</strong> utilizando el método{" "}
+                <strong>{selectedPlanet.discoverymethod}</strong>.
               </p>
+
               <p>
-                <strong>Año de Descubrimiento:</strong>{" "}
-                {selectedPlanet.disc_year}
-              </p>
-              <p>
-                <strong>Periodo Orbital:</strong>{" "}
-                {selectedPlanet.pl_orbper
-                  ? `${parseFloat(selectedPlanet.pl_orbper).toFixed(2)} días`
-                  : "N/A"}
-              </p>
-              <p>
-                <strong>Radio del Planeta:</strong>{" "}
+                🪐 Tiene un <strong>radio</strong> de{" "}
                 {selectedPlanet.pl_rade
                   ? `${parseFloat(selectedPlanet.pl_rade).toFixed(
                       2
-                    )} Radios Terrestres`
-                  : "N/A"}
-              </p>
-              <p>
-                <strong>Masa del Planeta:</strong>{" "}
+                    )} radios terrestres`
+                  : "dato desconocido"}{" "}
+                y una <strong>masa</strong> de{" "}
                 {selectedPlanet.pl_bmasse
                   ? `${parseFloat(selectedPlanet.pl_bmasse).toFixed(
                       2
-                    )} Masas Terrestres`
-                  : "N/A"}
+                    )} masas terrestres`
+                  : "dato desconocido"}
+                .
               </p>
+
               <p>
-                <strong>Temperatura de Equilibrio:</strong>{" "}
-                {convertKelvinToCelsius(selectedPlanet.pl_eqt)} °C
+                📆 Su <strong>período orbital</strong> es de{" "}
+                {selectedPlanet.pl_orbper
+                  ? `${parseFloat(selectedPlanet.pl_orbper).toFixed(2)} días`
+                  : "dato no disponible"}
+                , lo que indica cuánto tarda en dar una vuelta completa a su
+                estrella.
               </p>
+
               <p>
-                <strong>Distancia:</strong>{" "}
-                {selectedPlanet.sy_dist
-                  ? `${(parseFloat(selectedPlanet.sy_dist) * 3.26).toFixed(
-                      2
-                    )} años luz`
-                  : "N/A"}
+                🌡️ Tiene una <strong>temperatura de equilibrio</strong> estimada
+                de{" "}
+                <strong>
+                  {convertKelvinToCelsius(selectedPlanet.pl_eqt)} °C
+                </strong>
+                , lo que nos da una idea de si podría albergar agua líquida.
               </p>
+
               <p>
-                <strong>Radio de la Estrella:</strong>{" "}
-                {selectedPlanet.st_rad
-                  ? `${parseFloat(selectedPlanet.st_rad).toFixed(
-                      2
-                    )} Radios Solares`
-                  : "N/A"}
+                🛸 Se encuentra a una distancia de{" "}
+                <strong>
+                  {selectedPlanet.sy_dist
+                    ? `${(parseFloat(selectedPlanet.sy_dist) * 3.26).toFixed(
+                        2
+                      )} años luz`
+                    : "dato no disponible"}
+                </strong>{" "}
+                de la Tierra.
               </p>
-              <p>
-                <strong>Masa de la Estrella:</strong>{" "}
-                {selectedPlanet.st_mass
-                  ? `${parseFloat(selectedPlanet.st_mass).toFixed(
-                      2
-                    )} Masas Solares`
-                  : "N/A"}
-              </p>
-              <p>
-                <strong>Temperatura de la Estrella:</strong>{" "}
-                {convertKelvinToCelsius(selectedPlanet.st_teff)} °C
+
+              <hr className="text-secondary" />
+
+              <p>🌟 Su estrella anfitriona tiene:</p>
+              <ul>
+                <li>
+                  🔥 <strong>Temperatura:</strong>{" "}
+                  {convertKelvinToCelsius(selectedPlanet.st_teff)} °C
+                </li>
+                <li>
+                  🌞 <strong>Masa:</strong>{" "}
+                  {selectedPlanet.st_mass
+                    ? `${parseFloat(selectedPlanet.st_mass).toFixed(
+                        2
+                      )} masas solares`
+                    : "N/A"}
+                </li>
+                <li>
+                  ⭕ <strong>Radio:</strong>{" "}
+                  {selectedPlanet.st_rad
+                    ? `${parseFloat(selectedPlanet.st_rad).toFixed(
+                        2
+                      )} radios solares`
+                    : "N/A"}
+                </li>
+              </ul>
+
+              <p className="text-info mt-3">
+                {getHabitabilityReason(selectedPlanet) ===
+                "Cumple criterios de tamaño y temperatura"
+                  ? "✅ ¡Este planeta cumple con los criterios básicos para ser considerado potencialmente habitable! 🌍"
+                  : `ℹ️ Habitabilidad: ${getHabitabilityReason(
+                      selectedPlanet
+                    )}`}
               </p>
             </>
           ) : (
             <p>Cargando detalles...</p>
           )}
         </Modal.Body>
+        {selectedPlanet &&
+          getHabitabilityReason(selectedPlanet) ===
+            "Cumple criterios de tamaño y temperatura" && (
+            <Card
+              bg="dark"
+              text="light"
+              className="mt-4 shadow-sm border border-success"
+            >
+              <Card.Header className="bg-success text-light fw-bold">
+                🌍 ¿Qué lo hace "Potencialmente Habitable"?
+              </Card.Header>
+              <Card.Body>
+                <p>
+                  Este exoplaneta cumple con los criterios básicos de
+                  <strong> tamaño</strong> y <strong>temperatura</strong> que
+                  podrían permitir la existencia de agua líquida, uno de los
+                  elementos esenciales para la vida tal como la conocemos.
+                </p>
+                <ul className="list-unstyled">
+                  <li>🟢 Radio entre 0.5 y 2 veces el de la Tierra</li>
+                  <li>🟢 Temperatura estimada entre 270 K y 320 K</li>
+                </ul>
+                <p className="mb-0">
+                  Si bien esto no garantiza que haya vida, ¡sí lo convierte en
+                  un candidato muy interesante para futuras observaciones! 🔭
+                </p>
+              </Card.Body>
+            </Card>
+          )}
+
         <Modal.Footer className="bg-dark text-light border-secondary">
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cerrar
