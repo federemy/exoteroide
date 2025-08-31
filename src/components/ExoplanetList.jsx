@@ -159,7 +159,6 @@ export function ExoplanetList() {
 
   return (
     <Container className="my-5" fluid>
-      <h1 className="text-center mb-4 text-warning">Catálogo de Exoplanetas</h1>
       <p className="text-center text-muted">
         Haz clic en el nombre de un planeta para ver más detalles.
       </p>
@@ -256,6 +255,26 @@ export function ExoplanetList() {
                     {sortColumn === "st_rad" &&
                       (sortDirection === "asc" ? "▲" : "▼")}
                   </th>
+                  <th onClick={() => handleSort("pl_orbsmax")}>
+                    Distancia Máx. (UA){" "}
+                    {sortColumn === "pl_orbsmax" &&
+                      (sortDirection === "asc" ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("pl_orbeccen")}>
+                    Excentricidad{" "}
+                    {sortColumn === "pl_orbeccen" &&
+                      (sortDirection === "asc" ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("pl_insol")}>
+                    Insolación{" "}
+                    {sortColumn === "pl_insol" &&
+                      (sortDirection === "asc" ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("sy_pnum")}>
+                    Planetas en sistema{" "}
+                    {sortColumn === "sy_pnum" &&
+                      (sortDirection === "asc" ? "▲" : "▼")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -307,6 +326,22 @@ export function ExoplanetList() {
                         ? parseFloat(planet.st_rad).toFixed(2)
                         : "N/A"}
                     </td>
+                    <td>
+                      {planet.pl_orbsmax
+                        ? parseFloat(planet.pl_orbsmax).toFixed(2)
+                        : "N/A"}
+                    </td>
+                    <td>
+                      {planet.pl_orbeccen
+                        ? parseFloat(planet.pl_orbeccen).toFixed(2)
+                        : "N/A"}
+                    </td>
+                    <td>
+                      {planet.pl_insol
+                        ? parseFloat(planet.pl_insol).toFixed(2)
+                        : "N/A"}
+                    </td>
+                    <td>{planet.sy_pnum ? planet.sy_pnum : "N/A"}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,0 +1,56 @@
+.exoplanet-hero {
+  position: relative;
+  height: 300px;
+  background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #000 100%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #f8f9fa;
+  text-align: center;
+}
+
+.exoplanet-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: spin 15s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+.exoplanet {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(145deg, #66f, #33a);
+  border-radius: 50%;
+  box-shadow: 0 0 10px #66f, 0 0 30px #33a;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hero-title {
+  font-size: 2rem;
+  z-index: 1;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  z-index: 1;
+  color: #ccc;
+}
+
+@keyframes spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

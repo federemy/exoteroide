@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { ExoplanetList } from '../components/ExoplanetList.jsx';
+import { ExoplanetList } from "../components/ExoplanetList.jsx";
+import { ExoplanetHero } from "../components/ExoplanetHero.jsx";
 ---
-<BaseLayout title="Exoplanetas">
-    <main>
-        <ExoplanetList client:load />
-    </main>
+<BaseLayout title="Exploración de Exoplanetas">
+  <ExoplanetHero client:load />
+  <main>
+    <ExoplanetList client:load />
+  </main>
 </BaseLayout>

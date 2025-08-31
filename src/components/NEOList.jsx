@@ -13,6 +13,8 @@ import {
 import { DiameterChart } from "./DiameterChart.jsx";
 import { NEOModal } from "./NEOModal.jsx";
 
+import { HeroAnimationAsteroid } from "./HeroAnimationAsteroid.jsx";
+
 // Distancia media de la Tierra a la Luna en kilómetros
 const EARTH_MOON_DISTANCE_KM = 384400;
 
@@ -139,6 +141,8 @@ export function NEOList() {
       <h1 className="text-center mb-4 text-warning">
         Objetos Cercanos a la Tierra
       </h1>
+      <HeroAnimationAsteroid />
+
       <p className="text-center text-muted">
         Datos para el rango: {START_DATE} a {END_DATE}. Total de asteroides:{" "}
         {allNeos.length}.
@@ -295,8 +299,10 @@ export function NEOList() {
       {/* Modal con detalles */}
       <NEOModal
         show={showModal}
+        size="lg"
         onHide={() => setShowModal(false)}
-        neoId={selectedId}
+        neo={allNeos.find((n) => n.id === selectedId)}
+        centered
       />
     </Container>
   );
