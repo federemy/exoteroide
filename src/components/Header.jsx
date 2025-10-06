@@ -2,14 +2,13 @@
 import React from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 
-export function Header() {
+export function Header({ className = "" }) {
   return (
     <Navbar
-      bg="dark"
       variant="dark"
       expand="lg"
       sticky="top"
-      className="shadow-lg border-bottom border-warning"
+      className={`shadow-lg border-bottom border-warning transparent-bg ${className}`}
     >
       <Container>
         <Navbar.Brand

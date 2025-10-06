@@ -1,7 +1,8 @@
 ---
 // src/layouts/BaseLayout.astro
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Header } from '../components/Header.jsx';
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Header } from "../components/Header.jsx";
+import { Starfield } from "../components/Starfield.jsx";
 
 interface Props {
   title: string;
@@ -9,13 +10,17 @@ interface Props {
 
 const { title } = Astro.props;
 ---
+
 <!doctype html>
 <html lang="es" data-bs-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>"
+    />
     <style>
       body {
         /* Fondo oscuro estelar */
@@ -23,32 +28,49 @@ const { title } = Astro.props;
       }
       /* Efecto de 'Hover' para la Tarjeta */
       .hover-scale {
-        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        transition:
+          transform 0.3s ease-in-out,
+          box-shadow 0.3s ease-in-out;
       }
       .hover-scale:hover {
         transform: scale(1.01);
         /* Brillo de acento en el hover */
         box-shadow: 0 0.5rem 1rem rgba(255, 193, 7, 0.4) !important;
       }
+      .transparent-bg {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+      }
     </style>
   </head>
   <body>
-    <Header client:load />
+    <Header className="fixed-top bg-dark z-3" client:load />
+
+    <Starfield client:load />
     <slot />
     <footer>
-    <div class="text-center border-top border-secondary py-3 small">
-      <div>
-        Hecho por
-        <a href="https://www.blyxsolutions.com.ar/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
-          <span style="color:#2DD4BF;">Blyx</span>
-          <span style="color:#FB7185;">Solutions</span>
-        </a>
-        -
-        <a style="color:#FB7185;text-decoration:none" href="https://cafecito.app/blyxsolutions" rel="noopener" target="_blank">
-          ☕️ Invitame un cafecito
-        </a>
+      <div class="text-center border-top border-secondary py-3 small">
+        <div>
+          Hecho por
+          <a
+            href="https://www.blyxsolutions.com.ar/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="text-decoration:none;"
+          >
+            <span style="color:#2DD4BF;">Blyx</span>
+            <span style="color:#FB7185;">Solutions</span>
+          </a>
+          -
+          <a
+            style="color:#FB7185;text-decoration:none"
+            href="https://cafecito.app/blyxsolutions"
+            rel="noopener"
+            target="_blank"
+          >
+            ☕️ Invitame un cafecito
+          </a>
+        </div>
       </div>
-    </div>
     </footer>
   </body>
 </html>

@@ -357,10 +357,7 @@ export function ExoplanetList() {
         onHide={() => setShowModal(false)}
         centered
       >
-        <Modal.Header
-          closeButton
-          className="bg-dark text-light border-secondary"
-        >
+        <Modal.Header closeButton className="text-light border-secondary">
           <Modal.Title>{selectedPlanet?.pl_name} - Detalles</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-light border-secondary">
