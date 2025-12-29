@@ -1,0 +1,10 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SolarSystem } from "../components/SolarSystem.jsx";
+---
+
+<BaseLayout title="Sistema Solar - Curiosidades">
+  <main>
+    <SolarSystem client:load />
+  </main>
+</BaseLayout>

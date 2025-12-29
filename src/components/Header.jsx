@@ -24,6 +24,10 @@ export function Header({ className = "" }) {
             <Nav.Link href="/exoplanetas" className="text-light">
               Exoplanetas
             </Nav.Link>
+            {/* Nuevo enlace al Sistema Solar */}
+            <Nav.Link href="/sistema-solar" className="text-light">
+              Sistema Solar
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
