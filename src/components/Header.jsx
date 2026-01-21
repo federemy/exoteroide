@@ -30,9 +30,6 @@ export function Header({ className = "" }) {
             <Nav.Link href="/astronautas" className="text-light mx-2">
               Tripulación
             </Nav.Link>
-            <Nav.Link href="/galeria" className="text-light mx-2">
-              📸 Foto del día
-            </Nav.Link>
             <Nav.Link href="/galeria-espacial" className="text-light mx-2">
               📸 Galería Espacial
             </Nav.Link>
