@@ -1,24 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { LiveSpace } from "../components/LiveSpace.jsx";
+import { Astronauts } from "../components/Astronauts.jsx";
 import { Header } from "../components/Header.jsx";
 import { Starfield } from "../components/Starfield.jsx";
 ---
 
-<BaseLayout title="En Vivo - Vigilancia Espacial">
+<BaseLayout title="Humanos en el Espacio - Exoteroide">
   <Starfield client:load />
-
-  <Header client:load />
-
   <main style="position: relative; z-index: 1;">
-    <LiveSpace client:load />
+    <Astronauts client:load />
   </main>
 </BaseLayout>
-
-<style is:global>
-  body {
-    background-color: #050505;
-    margin: 0;
-    padding: 0;
-  }
-</style>

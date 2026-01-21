@@ -16,17 +16,25 @@ export function Header({ className = "" }) {
           className="fw-bold fs-4 text-warning d-flex align-items-center"
         >
           <span style={{ fontSize: "1.5rem", marginRight: "0.5rem" }}>🚀</span>
-          Vigilancia NEOs
+          Exoteroide
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link href="/exoplanetas" className="text-light">
+          <Nav className="ms-auto align-items-center">
+            <Nav.Link href="/" className="text-light mx-2">
+              Inicio
+            </Nav.Link>
+            <Nav.Link href="/exoplanetas" className="text-light mx-2">
               Exoplanetas
             </Nav.Link>
-            {/* Nuevo enlace al Sistema Solar */}
-            <Nav.Link href="/sistema-solar" className="text-light">
-              Sistema Solar
+            <Nav.Link href="/astronautas" className="text-light mx-2">
+              Tripulación
+            </Nav.Link>
+            <Nav.Link href="/galeria" className="text-light mx-2">
+              📸 Foto del día
+            </Nav.Link>
+            <Nav.Link href="/galeria-espacial" className="text-light mx-2">
+              📸 Galería Espacial
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>

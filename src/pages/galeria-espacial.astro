@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { DeepSpaceGallery } from "../components/DeepSpaceGallery.jsx";
+import { Starfield } from "../components/Starfield.jsx";
+---
+
+<BaseLayout title="Galería Espacial - Exoteroide">
+  <Starfield client:load />
+  <main style="position: relative; z-index: 1;">
+    <DeepSpaceGallery client:load />
+  </main>
+</BaseLayout>
