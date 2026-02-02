@@ -1,0 +1,15 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+// Le cambiamos el nombre a 'LunasComponent' para que no haya conflicto
+import { Lunas as LunasComponent } from "../components/Lunas.jsx";
+import { Header } from "../components/Header.jsx";
+import { Starfield } from "../components/Starfield.jsx";
+---
+
+<BaseLayout title="Lunas en el Espacio - Exoteroide">
+  <Starfield client:load />
+  <main style="position: relative; z-index: 1;">
+    {/* Usamos el nuevo nombre aquí */}
+    <LunasComponent client:load />
+  </main>
+</BaseLayout>

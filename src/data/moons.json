@@ -1,0 +1,259 @@
+[
+  {
+    "planet": "Tierra",
+    "total_count": 1,
+    "description": "Nuestro único satélite natural, fundamental para la vida y los ciclos terrestres.",
+    "moons": [
+      {
+        "name": "La Luna",
+        "diameter": "3,475 km",
+        "gravity": "1.62 m/s²",
+        "distance": "384,400 km",
+        "type": "Rocosa / Silicatos",
+        "detail": "Estabiliza la inclinación de la Tierra. Es el único cuerpo celeste visitado por humanos."
+      }
+    ]
+  },
+  {
+    "planet": "Marte",
+    "total_count": 2,
+    "description": "Dos lunas pequeñas con formas irregulares, posiblemente asteroides capturados.",
+    "moons": [
+      {
+        "name": "Fobos",
+        "diameter": "22.2 km",
+        "gravity": "0.0057 m/s²",
+        "distance": "9,377 km",
+        "type": "Carbonácea",
+        "detail": "Orbita tan cerca de Marte que se espera que colisione con el planeta en 50 millones de años."
+      },
+      {
+        "name": "Deimos",
+        "diameter": "12.4 km",
+        "gravity": "0.003 m/s²",
+        "distance": "23,460 km",
+        "type": "Carbonácea",
+        "detail": "Es la luna más pequeña y externa; parece una roca espacial llena de cráteres suavizados por polvo."
+      }
+    ]
+  },
+  {
+    "planet": "Júpiter",
+    "total_count": 95,
+    "description": "Un mini sistema solar. Se listan las 4 lunas Galileanas y la interna Amaltea.",
+    "moons": [
+      {
+        "name": "Ganimedes",
+        "diameter": "5,268 km",
+        "gravity": "1.42 m/s²",
+        "distance": "1,070,400 km",
+        "type": "Hielo / Roca",
+        "detail": "Es la luna más grande de todo el sistema solar, incluso más grande que el planeta Mercurio."
+      },
+      {
+        "name": "Europa",
+        "diameter": "3,121 km",
+        "gravity": "1.31 m/s²",
+        "distance": "670,900 km",
+        "type": "Corteza de Hielo",
+        "detail": "Posee un océano de agua líquida bajo su superficie de hielo; es el lugar con más probabilidad de albergar vida."
+      },
+      {
+        "name": "Ío",
+        "diameter": "3,643 km",
+        "gravity": "1.79 m/s²",
+        "distance": "421,700 km",
+        "type": "Volcánica",
+        "detail": "El cuerpo con mayor actividad volcánica conocido; su superficie cambia constantemente por la lava."
+      },
+      {
+        "name": "Calixto",
+        "diameter": "4,821 km",
+        "gravity": "1.23 m/s²",
+        "distance": "1,882,700 km",
+        "type": "Hielo / Cráteres",
+        "detail": "Tiene la superficie más vieja del sistema solar, sin actividad geológica desde hace 4 mil millones de años."
+      },
+      {
+        "name": "Amaltea",
+        "diameter": "167 km",
+        "gravity": "0.02 m/s²",
+        "distance": "181,300 km",
+        "type": "Rocosa Irregular",
+        "detail": "La más importante de las lunas internas; emite más calor del que recibe del Sol."
+      }
+    ]
+  },
+  {
+    "planet": "Saturno",
+    "total_count": 146,
+    "description": "El planeta con más lunas. Se destacan las 5 lunas mayores con características únicas.",
+    "moons": [
+      {
+        "name": "Titán",
+        "diameter": "5,150 km",
+        "gravity": "1.35 m/s²",
+        "distance": "1,221,830 km",
+        "type": "Atmosférica",
+        "detail": "La única luna con una atmósfera densa y lagos líquidos de metano y etano en su superficie."
+      },
+      {
+        "name": "Encélado",
+        "diameter": "504 km",
+        "gravity": "0.11 m/s²",
+        "distance": "238,000 km",
+        "type": "Hielo Activo",
+        "detail": "Famosa por sus géiseres que expulsan agua al espacio, creando parte de los anillos de Saturno."
+      },
+      {
+        "name": "Mimas",
+        "diameter": "396 km",
+        "gravity": "0.06 m/s²",
+        "distance": "185,520 km",
+        "type": "Hielo",
+        "detail": "Conocida como la 'Estrella de la Muerte' por su enorme cráter Herschel."
+      },
+      {
+        "name": "Jápeto",
+        "diameter": "1,469 km",
+        "gravity": "0.22 m/s²",
+        "distance": "3,560,800 km",
+        "type": "Bicolor",
+        "detail": "Tiene un hemisferio oscuro como el carbón y otro brillante como la nieve."
+      },
+      {
+        "name": "Rea",
+        "diameter": "1,527 km",
+        "gravity": "0.26 m/s²",
+        "distance": "527,100 km",
+        "type": "Hielo / Roca",
+        "detail": "Compuesta principalmente por hielo; es la segunda luna más grande de Saturno."
+      }
+    ]
+  },
+  {
+    "planet": "Urano",
+    "total_count": 28,
+    "description": "Satélites helados nombrados por obras de Shakespeare. Se listan las 5 principales.",
+    "moons": [
+      {
+        "name": "Titania",
+        "diameter": "1,577 km",
+        "gravity": "0.37 m/s²",
+        "distance": "435,900 km",
+        "type": "Hielo / Roca",
+        "detail": "La luna más grande de Urano, marcada por fallas y cañones masivos."
+      },
+      {
+        "name": "Oberón",
+        "diameter": "1,522 km",
+        "gravity": "0.34 m/s²",
+        "distance": "583,500 km",
+        "type": "Hielo / Cráteres",
+        "detail": "La luna más externa de las grandes; su superficie es muy antigua y oscura."
+      },
+      {
+        "name": "Ariel",
+        "diameter": "1,158 km",
+        "gravity": "0.27 m/s²",
+        "distance": "191,000 km",
+        "type": "Hielo",
+        "detail": "Es el satélite con la superficie más brillante y joven de Urano."
+      },
+      {
+        "name": "Umbriel",
+        "diameter": "1,169 km",
+        "gravity": "0.23 m/s²",
+        "distance": "266,000 km",
+        "type": "Hielo Oscuro",
+        "detail": "La luna más oscura de Urano, refleja muy poca luz solar."
+      },
+      {
+        "name": "Miranda",
+        "diameter": "471 km",
+        "gravity": "0.07 m/s²",
+        "distance": "129,400 km",
+        "type": "Geología Mixta",
+        "detail": "Posee el acantilado más alto del sistema solar (Verona Rupes), de 20 km de altura."
+      }
+    ]
+  },
+  {
+    "planet": "Neptuno",
+    "total_count": 16,
+    "description": "Se listan las lunas mayores y más relevantes científicamente.",
+    "moons": [
+      {
+        "name": "Tritón",
+        "diameter": "2,706 km",
+        "gravity": "0.77 m/s²",
+        "distance": "354,800 km",
+        "type": "Nitrógeno Helado",
+        "detail": "Orbita al revés (retrógrada) y tiene volcanes de hielo que expulsan nitrógeno líquido."
+      },
+      {
+        "name": "Proteo",
+        "diameter": "420 km",
+        "gravity": "0.07 m/s²",
+        "distance": "117,600 km",
+        "type": "Irregular",
+        "detail": "Es tan grande como puede ser un cuerpo sin que su gravedad lo convierta en esfera."
+      },
+      {
+        "name": "Nereida",
+        "diameter": "340 km",
+        "gravity": "0.04 m/s²",
+        "distance": "5,513,400 km",
+        "type": "Hielo",
+        "detail": "Tiene una de las órbitas más alargadas (excéntricas) de cualquier luna."
+      }
+    ]
+  },
+  {
+    "planet": "Plutón",
+    "total_count": 5,
+    "description": "Se listan todas las lunas del sistema plutoniano.",
+    "moons": [
+      {
+        "name": "Caronte",
+        "diameter": "1,212 km",
+        "gravity": "0.28 m/s²",
+        "distance": "19,640 km",
+        "type": "Hielo / Roca",
+        "detail": "Es tan grande que Plutón y ella orbitan un punto común en el espacio."
+      },
+      {
+        "name": "Nix",
+        "diameter": "49 km",
+        "gravity": "0.001 m/s²",
+        "distance": "48,700 km",
+        "type": "Hielo",
+        "detail": "Una luna pequeña con forma de grano de frijol descubierta en 2005."
+      },
+      {
+        "name": "Hidra",
+        "diameter": "51 km",
+        "gravity": "0.001 m/s²",
+        "distance": "64,700 km",
+        "type": "Hielo",
+        "detail": "La luna más externa de Plutón, cubierta por hielo de agua muy puro."
+      },
+      {
+        "name": "Cerbero",
+        "diameter": "12 km",
+        "gravity": "0.0005 m/s²",
+        "distance": "57,700 km",
+        "type": "Rocosa",
+        "detail": "Tiene una estructura lobulada, posiblemente formada por la unión de dos objetos."
+      },
+      {
+        "name": "Estigia",
+        "diameter": "10 km",
+        "gravity": "0.0004 m/s²",
+        "distance": "42,600 km",
+        "type": "Rocosa",
+        "detail": "La luna más pequeña y cercana a Plutón, detectada por la sonda New Horizons."
+      }
+    ]
+  }
+]
