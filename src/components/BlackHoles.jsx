@@ -20,84 +20,18 @@ const NASA_IMAGES_API = "https://images-api.nasa.gov/search";
 const BLACK_HOLE_API_RAW =
   "https://raw.githubusercontent.com/DogukanUrker/BlackHoleAPI/master/data.json";
 const SIMBAD_TAP_API = "https://simbad.cds.unistra.fr/simbad/sim-tap/sync";
-const BLACKCAT_CSV =
-  "https://raw.githubusercontent.com/bersavosh/BlackCAT/master/data/blackcat.csv";
+
 const compactNumber = (value) => {
-  if (value === null || value === undefined || value === "")
-    return "No disponible";
+  if (value === null || value === undefined || value === "") return "No disponible";
   const n = Number(value);
   if (!Number.isFinite(n)) return String(value);
   return new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(n);
-};
-const parseCsvLine = (line) => {
-  const result = [];
-  let current = "";
-  let insideQuotes = false;
-
-  for (const char of line) {
-    if (char === '"') insideQuotes = !insideQuotes;
-    else if (char === "," && !insideQuotes) {
-      result.push(current.trim());
-      current = "";
-    } else current += char;
-  }
-
-  result.push(current.trim());
-  return result;
-};
-
-const fetchBlackCatObjects = async () => {
-  const response = await fetch(BLACKCAT_CSV, { cache: "no-store" });
-  if (!response.ok) throw new Error("BlackCAT no respondió correctamente");
-
-  const text = await response.text();
-  const lines = text.split("\n").filter(Boolean);
-  const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase());
-
-  return lines.slice(1).map((line, index) => {
-    const values = parseCsvLine(line);
-    const row = Object.fromEntries(
-      headers.map((header, i) => [header, cleanText(values[i] || "")]),
-    );
-
-    const name =
-      row.name ||
-      row.source ||
-      row.object ||
-      row.main_id ||
-      `BlackCAT ${index + 1}`;
-
-    const distanceKpc =
-      normalizeNumber(row.distance) ||
-      normalizeNumber(row.d_kpc) ||
-      normalizeNumber(row.dist);
-
-    return {
-      id: `blackcat-${index}-${name}`,
-      name,
-      type: "Binario de rayos X",
-      location: "Vía Láctea",
-      distanceKpc,
-      distanceLy: distanceKpc ? Math.round(distanceKpc * 3261.56) : null,
-      massSolar:
-        normalizeNumber(row.mass) ||
-        normalizeNumber(row.m_bh) ||
-        normalizeNumber(row.mbh),
-      orbitalPeriodHours:
-        row.period || row.porb || row.orbital_period || row.p_orb || "",
-      notes:
-        "Registro obtenido desde BlackCAT, catálogo de binarios de rayos X con candidatos a agujero negro.",
-      source: "BlackCAT",
-    };
-  });
 };
 
 const normalizeNumber = (value) => {
   if (value === null || value === undefined || value === "") return null;
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  const match = String(value)
-    .replace(/,/g, "")
-    .match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+  const match = String(value).replace(/,/g, "").match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
   if (!match) return null;
   const n = Number(match[0]);
   return Number.isFinite(n) ? n : null;
@@ -118,32 +52,85 @@ const cleanText = (value = "") =>
     .replace(/&quot;/g, '"')
     .trim();
 
-const formatLy = (value) =>
-  value ? `${compactNumber(value)} años luz` : "No disponible";
-const formatMass = (value) =>
-  value ? `${compactNumber(value)} masas solares` : "No disponible";
+const formatLy = (value) => (value ? `${compactNumber(value)} años luz` : "No disponible");
+const formatMass = (value) => (value ? `${compactNumber(value)} masas solares` : "No disponible");
+
+const normalizeType = (type = "", name = "") => {
+  const value = `${type} ${name}`.toLowerCase();
+
+  if (
+    value.includes("ultramasivo") ||
+    value.includes("quasar") ||
+    value.includes("cuásar")
+  ) {
+    return "Ultramasivo / cuásar";
+  }
+
+  if (value.includes("supermassive") || value.includes("supermasivo")) {
+    return "Supermasivo";
+  }
+
+  if (
+    value.includes("x-ray") ||
+    value.includes("rayos x") ||
+    value.includes("binary") ||
+    value.includes("binario") ||
+    value.includes("xb") ||
+    value.includes("hxb") ||
+    value.includes("lmxb")
+  ) {
+    return "Binario de rayos X";
+  }
+
+  if (value.includes("stellar") || value.includes("estelar")) {
+    return "Estelar";
+  }
+
+  if (value.includes("intermediate") || value.includes("intermedio")) {
+    return "Intermedio";
+  }
+
+  if (value.includes("candidate") || value.includes("candidato")) {
+    return "Candidato";
+  }
+
+  return "Sin clasificar";
+};
+
+const normalizeCatalogItem = (item) => ({
+  ...item,
+  rawType: item?.rawType || item?.type,
+  type: normalizeType(item?.type, item?.name),
+});
+
+const formatMassOrNotPublished = (value) =>
+  value ? formatMass(value) : <span className="text-white-50 small">No publicada por esta fuente</span>;
+
+const formatPeriodOrNotPublished = (value) => {
+  const cleaned = cleanText(value || "");
+  return cleaned ? `${cleaned} h` : <span className="text-white-50 small">No publicado por esta fuente</span>;
+};
+
+const formatRaDec = (item) => {
+  const ra = cleanText(item?.ra || "");
+  const dec = cleanText(item?.dec || "");
+  if (!ra && !dec) return <span className="text-white-50 small">No publicado</span>;
+  return `${ra || "RA no publicada"}${dec ? ` / ${dec}` : ""}`;
+};
 
 const distanceInsight = (distanceLy) => {
-  if (!distanceLy)
-    return "No hay distancia confiable publicada para este objeto.";
-  if (distanceLy <= 5000)
-    return "Está relativamente cerca en escala galáctica, por eso puede estudiarse con más detalle.";
-  if (distanceLy <= 25000)
-    return "Está dentro de nuestra galaxia; sus mediciones suelen depender del movimiento de estrellas compañeras o emisiones de rayos X.";
-  if (distanceLy <= 100000)
-    return "Está en escala de Vía Láctea o alrededores; la distancia ya vuelve más inciertas algunas propiedades observadas.";
+  if (!distanceLy) return "No hay distancia confiable publicada para este objeto.";
+  if (distanceLy <= 5000) return "Está relativamente cerca en escala galáctica, por eso puede estudiarse con más detalle.";
+  if (distanceLy <= 25000) return "Está dentro de nuestra galaxia; sus mediciones suelen depender del movimiento de estrellas compañeras o emisiones de rayos X.";
+  if (distanceLy <= 100000) return "Está en escala de Vía Láctea o alrededores; la distancia ya vuelve más inciertas algunas propiedades observadas.";
   return "Está a escala extragaláctica: lo vemos como era hace millones o miles de millones de años.";
 };
 
 const massInsight = (massSolar) => {
-  if (!massSolar)
-    return "La masa no está disponible en este registro; muchas veces se infiere indirectamente.";
-  if (massSolar < 100)
-    return "Su masa encaja con un agujero negro estelar, probablemente nacido del colapso de una estrella masiva.";
-  if (massSolar < 1000000)
-    return "Está en un rango intermedio poco común, útil para entender cómo crecen los agujeros negros.";
-  if (massSolar < 1000000000)
-    return "Es supermasivo; normalmente vive en el centro de una galaxia e influye en su dinámica.";
+  if (!massSolar) return "La masa no está disponible en este registro; muchas veces se infiere indirectamente.";
+  if (massSolar < 100) return "Su masa encaja con un agujero negro estelar, probablemente nacido del colapso de una estrella masiva.";
+  if (massSolar < 1000000) return "Está en un rango intermedio poco común, útil para entender cómo crecen los agujeros negros.";
+  if (massSolar < 1000000000) return "Es supermasivo; normalmente vive en el centro de una galaxia e influye en su dinámica.";
   return "Es ultramasivo; suele asociarse a galaxias activas o cuásares muy luminosos.";
 };
 
@@ -151,21 +138,17 @@ const orbitalInsight = (period) => {
   const text = cleanText(period || "");
   if (!text) return "Sin periodo orbital publicado.";
   const value = normalizeNumber(text);
-  if (!value)
-    return "El periodo está publicado, pero requiere interpretación manual de la fuente original.";
-  if (value < 24)
-    return "Periodo corto: el objeto compañero está muy cerca y puede alimentar al agujero negro.";
-  if (value < 240)
-    return "Periodo medio: el sistema binario es amplio, pero todavía puede haber intercambio de material.";
+  if (!value) return "El periodo está publicado, pero requiere interpretación manual de la fuente original.";
+  if (value < 24) return "Periodo corto: el objeto compañero está muy cerca y puede alimentar al agujero negro.";
+  if (value < 240) return "Periodo medio: el sistema binario es amplio, pero todavía puede haber intercambio de material.";
   return "Periodo largo: la estrella compañera orbita más lejos; los eventos brillantes pueden ser más episódicos.";
 };
 
-const objectExplanation = (item) =>
-  [
-    distanceInsight(item?.distanceLy),
-    massInsight(item?.massSolar),
-    orbitalInsight(item?.orbitalPeriodHours),
-  ].filter(Boolean);
+const objectExplanation = (item) => [
+  distanceInsight(item?.distanceLy),
+  massInsight(item?.massSolar),
+  orbitalInsight(item?.orbitalPeriodHours),
+].filter(Boolean);
 
 const cleanDescription = (text = "") => {
   const trimmed = cleanText(text).replace(/\s+/g, " ").trim();
@@ -177,11 +160,7 @@ const formatDate = (dateValue) => {
   if (!dateValue) return "Fecha no disponible";
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) return dateValue;
-  return date.toLocaleDateString("es-AR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return date.toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" });
 };
 
 const getImageUrl = (item) => {
@@ -202,69 +181,23 @@ const normalizeNasaItem = (item) => {
     center: data.center || "NASA",
   };
 };
-const normalizeType = (type = "", name = "") => {
-  const value = `${type} ${name}`.toLowerCase();
 
-  if (
-    value.includes("ultramasivo") ||
-    value.includes("quasar") ||
-    value.includes("cuásar")
-  )
-    return "Ultramasivo / cuásar";
-
-  if (value.includes("supermassive") || value.includes("supermasivo"))
-    return "Supermasivo";
-
-  if (value.includes("stellar") || value.includes("estelar")) return "Estelar";
-
-  if (
-    value.includes("x-ray") ||
-    value.includes("rayos x") ||
-    value.includes("binary") ||
-    value.includes("binario")
-  )
-    return "Binario de rayos X";
-
-  if (value.includes("intermediate") || value.includes("intermedio"))
-    return "Intermedio";
-
-  if (value.includes("candidate") || value.includes("candidato"))
-    return "Candidato";
-
-  return "Sin clasificar";
-};
 const normalizeCommunityItem = (item, index) => {
   const names = Array.isArray(item?.name) ? item.name : [item?.name];
   const name = cleanText(names.find(Boolean) || `Objeto ${index + 1}`);
-  const distanceLy = normalizeNumber(
-    item?.distance?.ly ??
-      item?.distance?.lightYears ??
-      item?.distance?.number ??
-      item?.distance,
-  );
-  const massSolar = normalizeNumber(
-    item?.mass?.solarMass ?? item?.mass?.number ?? item?.mass,
-  );
+  const distanceLy = normalizeNumber(item?.distance?.ly ?? item?.distance?.lightYears ?? item?.distance?.number ?? item?.distance);
+  const massSolar = normalizeNumber(item?.mass?.solarMass ?? item?.mass?.number ?? item?.mass);
   return {
     id: `bhapi-${item?.id ?? index}`,
     name,
     aliases: names.filter(Boolean).map(cleanText).join(" / "),
-    type: cleanText(
-      item?.type || item?.kind || item?.list || "Agujero negro / candidato",
-    ),
-    location: cleanText(
-      item?.constellation || item?.coordinates || item?.map || "No disponible",
-    ),
+    type: cleanText(item?.type || item?.kind || item?.list || "Agujero negro / candidato"),
+    location: cleanText(item?.constellation || item?.coordinates || item?.map || "No disponible"),
     distanceLy,
     massSolar,
     ra: cleanText(item?.rightAscension || ""),
     dec: cleanText(item?.declination || ""),
-    notes: cleanDescription(
-      item?.description ||
-        item?.detail ||
-        item?.list ||
-        "Registro importado desde BlackHoleAPI.",
-    ),
+    notes: cleanDescription(item?.description || item?.detail || item?.list || "Registro importado desde BlackHoleAPI."),
     source: "BlackHoleAPI / GitHub",
   };
 };
@@ -278,8 +211,7 @@ const normalizeSimbadRow = (row, index) => ({
   massSolar: null,
   ra: row?.[2] ?? "",
   dec: row?.[3] ?? "",
-  notes:
-    "Registro obtenido desde SIMBAD. Puede traer coordenadas y clasificación, pero no siempre masa o distancia.",
+  notes: "Registro obtenido desde SIMBAD. Puede traer coordenadas y clasificación, pero no siempre masa o distancia.",
   source: "SIMBAD / CDS",
 });
 
@@ -304,22 +236,11 @@ const fetchSimbadObjects = async () => {
 const fetchLiveCatalog = async () => {
   const results = [];
 
-  const communityResponse = await fetch(BLACK_HOLE_API_RAW, {
-    cache: "no-store",
-  });
+  const communityResponse = await fetch(BLACK_HOLE_API_RAW, { cache: "no-store" });
   if (communityResponse.ok) {
     const communityData = await communityResponse.json();
-    const communityItems = Array.isArray(communityData)
-      ? communityData
-      : communityData?.items || communityData?.data || [];
+    const communityItems = Array.isArray(communityData) ? communityData : communityData?.items || communityData?.data || [];
     results.push(...communityItems.map(normalizeCommunityItem));
-  }
-
-  try {
-    const blackCatItems = await fetchBlackCatObjects();
-    results.push(...blackCatItems);
-  } catch (error) {
-    console.warn("BlackCAT no pudo cargarse", error);
   }
 
   try {
@@ -345,9 +266,7 @@ const sortByDistance = (a, b) => {
 };
 
 export function BlackHoles({ data = [] }) {
-  const [catalog, setCatalog] = useState(
-    Array.isArray(data) ? data : data?.items || [],
-  );
+  const [catalog, setCatalog] = useState(Array.isArray(data) ? data : data?.items || []);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [catalogError, setCatalogError] = useState("");
   const [catalogSource, setCatalogSource] = useState("Fallback inicial");
@@ -362,84 +281,52 @@ export function BlackHoles({ data = [] }) {
   const [activeImageQuery, setActiveImageQuery] = useState("black hole");
 
   useEffect(() => {
-    const items = Array.isArray(data) ? data : data?.items;
-
-    if (Array.isArray(items) && items.length > 0) {
-      const normalizedItems = items.map((item) => ({
-        ...item,
-        rawType: item.type,
-        type: normalizeType(item.type, item.name),
-      }));
-
-      setCatalog(normalizedItems);
+    let active = true;
+    const loadCatalog = async () => {
+      setCatalogLoading(true);
       setCatalogError("");
-    } else {
-      const fallbackItems = [...featuredBlackHoles, ...fallbackCatalog].map(
-        (item) => ({
-          ...item,
-          rawType: item.type,
-          type: normalizeType(item.type, item.name),
-        }),
-      );
-
-      setCatalog(fallbackItems);
-      setCatalogError(
-        "No se pudo cargar el catálogo ampliado. Estoy mostrando una base local reducida.",
-      );
-    }
-
-    setCatalogLoading(false);
-  }, [data]);
-
-  useEffect(() => {
-    const loadLive = async () => {
+      const fallback = Array.isArray(data) ? data : data?.items || [];
       try {
-        setCatalogLoading(true);
-
-        const liveData = await fetchLiveCatalog();
-
-        if (Array.isArray(liveData) && liveData.length > 0) {
-          const normalized = liveData.map((item) => ({
-            ...item,
-            rawType: item.type,
-            type: normalizeType(item.type, item.name),
-          }));
-
-          setCatalog(normalized);
-          setCatalogSource("BlackHoleAPI + SIMBAD");
-          setCatalogError("");
-        }
-      } catch (err) {
-        console.error("Error cargando catálogo vivo", err);
-        setCatalogError("No se pudo cargar el catálogo en vivo");
+        const liveItems = await fetchLiveCatalog();
+        if (!active) return;
+        if (liveItems.length === 0) throw new Error("Las fuentes externas no devolvieron objetos");
+        const merged = [...fallback, ...liveItems].map(normalizeCatalogItem);
+        const seen = new Set();
+        setCatalog(
+          merged.filter((item) => {
+            const key = String(item.name || item.id).toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          }),
+        );
+        setCatalogSource("Catálogo vivo: BlackHoleAPI + SIMBAD + fallback curado");
+      } catch (error) {
+        console.error(error);
+        if (!active) return;
+        setCatalog(fallback.map(normalizeCatalogItem));
+        setCatalogSource("Fallback curado");
+        setCatalogError("No se pudieron cargar las fuentes externas en este momento. Estoy mostrando el fallback curado.");
       } finally {
-        setCatalogLoading(false);
+        if (active) setCatalogLoading(false);
       }
     };
-
-    loadLive();
-  }, []);
+    loadCatalog();
+    return () => {
+      active = false;
+    };
+  }, [data]);
 
   useEffect(() => {
     const controller = new AbortController();
     const loadImages = async () => {
       setImagesLoading(true);
       try {
-        const params = new URLSearchParams({
-          q: activeImageQuery,
-          media_type: "image",
-          page_size: "24",
-        });
-        const response = await fetch(
-          `${NASA_IMAGES_API}?${params.toString()}`,
-          { signal: controller.signal },
-        );
-        if (!response.ok)
-          throw new Error("NASA Images no respondió correctamente");
+        const params = new URLSearchParams({ q: activeImageQuery, media_type: "image", page_size: "24" });
+        const response = await fetch(`${NASA_IMAGES_API}?${params.toString()}`, { signal: controller.signal });
+        if (!response.ok) throw new Error("NASA Images no respondió correctamente");
         const data = await response.json();
-        const normalized = (data?.collection?.items || [])
-          .map(normalizeNasaItem)
-          .filter((item) => item.imageUrl);
+        const normalized = (data?.collection?.items || []).map(normalizeNasaItem).filter((item) => item.imageUrl);
         setImages(normalized);
       } catch (error) {
         if (error.name !== "AbortError") console.error(error);
@@ -464,7 +351,6 @@ export function BlackHoles({ data = [] }) {
 
   const typeOptions = useMemo(() => {
     const available = new Set(catalog.map((item) => item.type).filter(Boolean));
-
     return preferredTypeOrder.filter(
       (type) => type === "Todos" || available.has(type),
     );
@@ -476,23 +362,13 @@ export function BlackHoles({ data = [] }) {
       .filter((item) => {
         const matchesSearch =
           !normalizedSearch ||
-          [
-            item.name,
-            item.aliases,
-            item.location,
-            item.ra,
-            item.dec,
-            item.notes,
-            item.source,
-          ]
+          [item.name, item.aliases, item.location, item.ra, item.dec, item.notes, item.source]
             .filter(Boolean)
             .join(" ")
             .toLowerCase()
             .includes(normalizedSearch);
         const matchesType = typeFilter === "Todos" || item.type === typeFilter;
-        const matchesDistance =
-          maxDistance === "Todos" ||
-          (item.distanceLy && item.distanceLy <= Number(maxDistance));
+        const matchesDistance = maxDistance === "Todos" || (item.distanceLy && item.distanceLy <= Number(maxDistance));
         return matchesSearch && matchesType && matchesDistance;
       })
       .sort(sortByDistance);
@@ -512,13 +388,10 @@ export function BlackHoles({ data = [] }) {
       `}</style>
 
       <div className="text-center mb-5">
-        <Badge bg="dark" className="mb-3 px-3 py-2 border border-info">
-          CATÁLOGO VIVO + NASA
-        </Badge>
+        <Badge bg="dark" className="mb-3 px-3 py-2 border border-info">CATÁLOGO VIVO + NASA</Badge>
         <h1 className="display-4 fw-bold text-white">Agujeros negros</h1>
         <p className="lead text-white-50 mx-auto" style={{ maxWidth: 820 }}>
-          Catálogo actualizado desde fuentes externas en el navegador, más
-          imágenes desde NASA Image and Video Library.
+          Catálogo actualizado desde fuentes externas en el navegador, más imágenes desde NASA Image and Video Library.
         </p>
       </div>
 
@@ -531,70 +404,41 @@ export function BlackHoles({ data = [] }) {
                   <Form.Label className="text-white-50">Buscar</Form.Label>
                   <InputGroup>
                     <InputGroup.Text>🔎</InputGroup.Text>
-                    <Form.Control
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="Nombre, coordenadas, fuente..."
-                    />
+                    <Form.Control value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nombre, coordenadas, fuente..." />
                   </InputGroup>
                 </Col>
                 <Col md={3}>
                   <Form.Label className="text-white-50">Tipo</Form.Label>
-                  <Form.Select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                  >
-                    {typeOptions.map((option) => (
-                      <option key={option}>{option}</option>
-                    ))}
+                  <Form.Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+                    {typeOptions.map((option) => <option key={option}>{option}</option>)}
                   </Form.Select>
                 </Col>
                 <Col md={3}>
-                  <Form.Label className="text-white-50">
-                    Distancia máxima
-                  </Form.Label>
-                  <Form.Select
-                    value={maxDistance}
-                    onChange={(e) => setMaxDistance(e.target.value)}
-                  >
+                  <Form.Label className="text-white-50">Distancia máxima</Form.Label>
+                  <Form.Select value={maxDistance} onChange={(e) => setMaxDistance(e.target.value)}>
                     <option>Todos</option>
                     <option value="5000">Hasta 5.000 años luz</option>
                     <option value="10000">Hasta 10.000 años luz</option>
                     <option value="25000">Hasta 25.000 años luz</option>
                     <option value="100000">Hasta 100.000 años luz</option>
-                    <option value="100000000">
-                      Hasta 100 millones años luz
-                    </option>
-                    <option value="11000000000">
-                      Hasta 11 mil millones años luz
-                    </option>
+                    <option value="100000000">Hasta 100 millones años luz</option>
+                    <option value="11000000000">Hasta 11 mil millones años luz</option>
                   </Form.Select>
                 </Col>
                 <Col md={1} className="text-md-end">
-                  <Badge bg="info" text="dark" className="px-3 py-2">
-                    {filteredCatalog.length}
-                  </Badge>
+                  <Badge bg="info" text="dark" className="px-3 py-2">{filteredCatalog.length}</Badge>
                 </Col>
               </Row>
             </Card.Body>
           </Card>
 
-          <Alert
-            variant="dark"
-            className="border border-info text-white bg-black mb-4"
-          >
-            <strong>Fuente actual:</strong>{" "}
-            {catalogLoading ? "cargando..." : catalogSource}. La página ya no
-            usa rutas /api internas, así que Netlify puede compilar estático y
-            los datos externos se actualizan al abrir la página.
+          <Alert variant="dark" className="border border-info text-white bg-black mb-4">
+            <strong>Fuente actual:</strong> {catalogLoading ? "cargando..." : catalogSource}. La tabla prioriza datos que sí suelen publicar las fuentes abiertas: distancia, coordenadas y origen. Masa y periodo orbital aparecen en el detalle cuando la fuente los trae.
           </Alert>
           {catalogError && <Alert variant="warning">{catalogError}</Alert>}
 
           {catalogLoading ? (
-            <div className="text-center py-5">
-              <Spinner animation="border" variant="info" />
-              <p className="text-info mt-3">Cargando catálogo vivo...</p>
-            </div>
+            <div className="text-center py-5"><Spinner animation="border" variant="info" /><p className="text-info mt-3">Cargando catálogo vivo...</p></div>
           ) : (
             <Table responsive hover className="bh-table align-middle">
               <thead>
@@ -602,8 +446,7 @@ export function BlackHoles({ data = [] }) {
                   <th>Objeto</th>
                   <th>Tipo</th>
                   <th>Distancia</th>
-                  <th>Masa</th>
-                  <th>Periodo orbital</th>
+                  <th>RA / DEC</th>
                   <th>Fuente</th>
                   <th></th>
                 </tr>
@@ -612,24 +455,11 @@ export function BlackHoles({ data = [] }) {
                 {filteredCatalog.map((item) => (
                   <tr key={`${item.source}-${item.id}-${item.name}`}>
                     <td className="fw-bold text-white">{item.name}</td>
-                    <td>
-                      <Badge bg="secondary">{item.type}</Badge>
-                    </td>
+                    <td><Badge bg="secondary">{item.type}</Badge></td>
                     <td>{formatLy(item.distanceLy)}</td>
-                    <td>{formatMass(item.massSolar)}</td>
-                    <td>
-                      {cleanText(item.orbitalPeriodHours) || "No disponible"}
-                    </td>
+                    <td className="text-white-50 small">{formatRaDec(item)}</td>
                     <td className="text-white-50 small">{item.source}</td>
-                    <td className="text-end">
-                      <Button
-                        size="sm"
-                        variant="outline-info"
-                        onClick={() => setSelected(item)}
-                      >
-                        Ver
-                      </Button>
-                    </td>
+                    <td className="text-end"><Button size="sm" variant="outline-info" onClick={() => setSelected(item)}>Ver</Button></td>
                   </tr>
                 ))}
               </tbody>
@@ -638,165 +468,35 @@ export function BlackHoles({ data = [] }) {
         </Tab>
 
         <Tab eventKey="imagenes" title="Imágenes NASA">
-          <Card className="black-card mb-4">
-            <Card.Body>
-              <Form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setActiveImageQuery(imageQuery.trim() || "black hole");
-                }}
-              >
-                <InputGroup>
-                  <Form.Control
-                    value={imageQuery}
-                    onChange={(e) => setImageQuery(e.target.value)}
-                    placeholder="black hole, M87, Sagittarius A..."
-                  />
-                  <Button type="submit" variant="info">
-                    Buscar en NASA
-                  </Button>
-                </InputGroup>
-              </Form>
-            </Card.Body>
-          </Card>
-          {imagesLoading ? (
-            <div className="text-center py-5">
-              <Spinner animation="grow" variant="info" />
-              <p className="text-info mt-3">Buscando imágenes NASA...</p>
-            </div>
-          ) : (
-            <Row className="g-4">
-              {images.map((item) => (
-                <Col key={item.id} md={6} lg={4} xl={3}>
-                  <Card
-                    className="black-card h-100"
-                    onClick={() => setSelectedImage(item)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <Card.Img src={item.imageUrl} className="bh-img" />
-                    <Card.Body>
-                      <small className="text-violet fw-bold">{item.date}</small>
-                      <Card.Title className="h6 text-white mt-2">
-                        {item.title}
-                      </Card.Title>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+          <Card className="black-card mb-4"><Card.Body>
+            <Form onSubmit={(e) => { e.preventDefault(); setActiveImageQuery(imageQuery.trim() || "black hole"); }}>
+              <InputGroup><Form.Control value={imageQuery} onChange={(e) => setImageQuery(e.target.value)} placeholder="black hole, M87, Sagittarius A..." /><Button type="submit" variant="info">Buscar en NASA</Button></InputGroup>
+            </Form>
+          </Card.Body></Card>
+          {imagesLoading ? <div className="text-center py-5"><Spinner animation="grow" variant="info" /><p className="text-info mt-3">Buscando imágenes NASA...</p></div> : (
+            <Row className="g-4">{images.map((item) => <Col key={item.id} md={6} lg={4} xl={3}><Card className="black-card h-100" onClick={() => setSelectedImage(item)} style={{ cursor: "pointer" }}><Card.Img src={item.imageUrl} className="bh-img" /><Card.Body><small className="text-violet fw-bold">{item.date}</small><Card.Title className="h6 text-white mt-2">{item.title}</Card.Title></Card.Body></Card></Col>)}</Row>
           )}
         </Tab>
       </Tabs>
 
-      <Modal
-        show={!!selected}
-        onHide={() => setSelected(null)}
-        centered
-        size="lg"
-      >
-        <Modal.Header
-          closeButton
-          closeVariant="white"
-          className="border-secondary"
-        >
-          <Modal.Title className="text-violet">{selected?.name}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Row className="g-3">
-            <Col md={6}>
-              <strong>Tipo:</strong>
-              <br />
-              {selected?.type}
-            </Col>
-            <Col md={6}>
-              <strong>Ubicación:</strong>
-              <br />
-              {selected?.location || "No disponible"}
-            </Col>
-            <Col md={6}>
-              <strong>Distancia:</strong>
-              <br />
-              {formatLy(selected?.distanceLy)}
-            </Col>
-            <Col md={6}>
-              <strong>Masa:</strong>
-              <br />
-              {formatMass(selected?.massSolar)}
-            </Col>
-            <Col md={6}>
-              <strong>RA / DEC:</strong>
-              <br />
-              {selected?.ra || "No disponible"} {selected?.dec || ""}
-            </Col>
-            <Col md={6}>
-              <strong>Fuente:</strong>
-              <br />
-              {selected?.source}
-            </Col>
-            <Col xs={12}>
-              <Card className="bg-dark border-secondary mt-2">
-                <Card.Body>
-                  <strong className="text-info">
-                    Cómo interpretar estos datos
-                  </strong>
-                  <ul className="text-white-50 mt-3 mb-0">
-                    {selected &&
-                      objectExplanation(selected).map((line) => (
-                        <li key={line}>{line}</li>
-                      ))}
-                  </ul>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col xs={12}>
-              <strong>Notas:</strong>
-              <p className="text-white-50 mt-2">
-                {selected?.notes ||
-                  "Objeto importado desde catálogo astronómico."}
-              </p>
-            </Col>
-          </Row>
-        </Modal.Body>
+      <Modal show={!!selected} onHide={() => setSelected(null)} centered size="lg">
+        <Modal.Header closeButton closeVariant="white" className="border-secondary"><Modal.Title className="text-violet">{selected?.name}</Modal.Title></Modal.Header>
+        <Modal.Body><Row className="g-3">
+          <Col md={6}><strong>Tipo:</strong><br />{selected?.type}</Col>
+          <Col md={6}><strong>Ubicación:</strong><br />{selected?.location || "No disponible"}</Col>
+          <Col md={6}><strong>Distancia:</strong><br />{formatLy(selected?.distanceLy)}</Col>
+          <Col md={6}><strong>Masa estimada:</strong><br />{formatMassOrNotPublished(selected?.massSolar)}</Col>
+          <Col md={6}><strong>Periodo orbital:</strong><br />{formatPeriodOrNotPublished(selected?.orbitalPeriodHours)}</Col>
+          <Col md={6}><strong>RA / DEC:</strong><br />{formatRaDec(selected)}</Col>
+          <Col md={6}><strong>Fuente:</strong><br />{selected?.source}</Col>
+          <Col xs={12}><Card className="bg-dark border-secondary mt-2"><Card.Body><strong className="text-info">Cómo interpretar estos datos</strong><ul className="text-white-50 mt-3 mb-0">{selected && objectExplanation(selected).map((line) => <li key={line}>{line}</li>)}</ul></Card.Body></Card></Col>
+          <Col xs={12}><strong>Notas:</strong><p className="text-white-50 mt-2">{selected?.notes || "Objeto importado desde catálogo astronómico."}</p></Col>
+        </Row></Modal.Body>
       </Modal>
 
-      <Modal
-        show={!!selectedImage}
-        onHide={() => setSelectedImage(null)}
-        centered
-        size="xl"
-      >
-        <Modal.Header
-          closeButton
-          closeVariant="white"
-          className="border-secondary"
-        >
-          <Modal.Title className="text-violet">
-            {selectedImage?.title}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="p-0">
-          {selectedImage?.imageUrl && (
-            <img
-              src={selectedImage.imageUrl}
-              className="img-fluid w-100"
-              alt={selectedImage.title}
-            />
-          )}
-          <div className="p-4 bg-dark">
-            <p>{selectedImage?.description}</p>
-            <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
-              <span className="text-white-50 small">
-                {selectedImage?.center} · {selectedImage?.date}
-              </span>
-              <Button
-                variant="info"
-                onClick={() => window.open(selectedImage?.imageUrl, "_blank")}
-              >
-                Abrir imagen
-              </Button>
-            </div>
-          </div>
-        </Modal.Body>
+      <Modal show={!!selectedImage} onHide={() => setSelectedImage(null)} centered size="xl">
+        <Modal.Header closeButton closeVariant="white" className="border-secondary"><Modal.Title className="text-violet">{selectedImage?.title}</Modal.Title></Modal.Header>
+        <Modal.Body className="p-0">{selectedImage?.imageUrl && <img src={selectedImage.imageUrl} className="img-fluid w-100" alt={selectedImage.title} />}<div className="p-4 bg-dark"><p>{selectedImage?.description}</p><div className="d-flex justify-content-between align-items-center gap-3 flex-wrap"><span className="text-white-50 small">{selectedImage?.center} · {selectedImage?.date}</span><Button variant="info" onClick={() => window.open(selectedImage?.imageUrl, "_blank")}>Abrir imagen</Button></div></div></Modal.Body>
       </Modal>
     </Container>
   );
