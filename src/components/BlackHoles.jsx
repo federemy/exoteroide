@@ -322,6 +322,35 @@ export function BlackHoles({ data = [] }) {
   }, [data]);
 
   useEffect(() => {
+    const loadLive = async () => {
+      try {
+        setCatalogLoading(true);
+
+        const liveData = await fetchLiveCatalog();
+
+        if (Array.isArray(liveData) && liveData.length > 0) {
+          const normalized = liveData.map((item) => ({
+            ...item,
+            rawType: item.type,
+            type: normalizeType(item.type, item.name),
+          }));
+
+          setCatalog(normalized);
+          setCatalogSource("BlackHoleAPI + SIMBAD");
+          setCatalogError("");
+        }
+      } catch (err) {
+        console.error("Error cargando catálogo vivo", err);
+        setCatalogError("No se pudo cargar el catálogo en vivo");
+      } finally {
+        setCatalogLoading(false);
+      }
+    };
+
+    loadLive();
+  }, []);
+
+  useEffect(() => {
     const controller = new AbortController();
     const loadImages = async () => {
       setImagesLoading(true);
