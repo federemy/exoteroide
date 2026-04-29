@@ -1,0 +1,10 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Anomalias from "../components/Anomalias.jsx";
+---
+
+<BaseLayout title="Anomalías del universo - Exoteroide">
+  <main style="position: relative; z-index: 1;">
+    <Anomalias client:load />
+  </main>
+</BaseLayout>

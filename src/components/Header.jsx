@@ -36,6 +36,9 @@ export function Header({ className = "" }) {
             <Nav.Link href="/agujeros-negros" className="text-light mx-2">
               🕳️ Agujeros negros
             </Nav.Link>
+            <Nav.Link href="/anomalias" className="text-light mx-2">
+              🌀 Anomalías
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
