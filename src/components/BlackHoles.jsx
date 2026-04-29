@@ -20,13 +20,76 @@ const NASA_IMAGES_API = "https://images-api.nasa.gov/search";
 const BLACK_HOLE_API_RAW =
   "https://raw.githubusercontent.com/DogukanUrker/BlackHoleAPI/master/data.json";
 const SIMBAD_TAP_API = "https://simbad.cds.unistra.fr/simbad/sim-tap/sync";
-
+const BLACKCAT_CSV =
+  "https://raw.githubusercontent.com/bersavosh/BlackCAT/master/data/blackcat.csv";
 const compactNumber = (value) => {
   if (value === null || value === undefined || value === "")
     return "No disponible";
   const n = Number(value);
   if (!Number.isFinite(n)) return String(value);
   return new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(n);
+};
+const parseCsvLine = (line) => {
+  const result = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for (const char of line) {
+    if (char === '"') insideQuotes = !insideQuotes;
+    else if (char === "," && !insideQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else current += char;
+  }
+
+  result.push(current.trim());
+  return result;
+};
+
+const fetchBlackCatObjects = async () => {
+  const response = await fetch(BLACKCAT_CSV, { cache: "no-store" });
+  if (!response.ok) throw new Error("BlackCAT no respondió correctamente");
+
+  const text = await response.text();
+  const lines = text.split("\n").filter(Boolean);
+  const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase());
+
+  return lines.slice(1).map((line, index) => {
+    const values = parseCsvLine(line);
+    const row = Object.fromEntries(
+      headers.map((header, i) => [header, cleanText(values[i] || "")]),
+    );
+
+    const name =
+      row.name ||
+      row.source ||
+      row.object ||
+      row.main_id ||
+      `BlackCAT ${index + 1}`;
+
+    const distanceKpc =
+      normalizeNumber(row.distance) ||
+      normalizeNumber(row.d_kpc) ||
+      normalizeNumber(row.dist);
+
+    return {
+      id: `blackcat-${index}-${name}`,
+      name,
+      type: "Binario de rayos X",
+      location: "Vía Láctea",
+      distanceKpc,
+      distanceLy: distanceKpc ? Math.round(distanceKpc * 3261.56) : null,
+      massSolar:
+        normalizeNumber(row.mass) ||
+        normalizeNumber(row.m_bh) ||
+        normalizeNumber(row.mbh),
+      orbitalPeriodHours:
+        row.period || row.porb || row.orbital_period || row.p_orb || "",
+      notes:
+        "Registro obtenido desde BlackCAT, catálogo de binarios de rayos X con candidatos a agujero negro.",
+      source: "BlackCAT",
+    };
+  });
 };
 
 const normalizeNumber = (value) => {
@@ -250,6 +313,13 @@ const fetchLiveCatalog = async () => {
       ? communityData
       : communityData?.items || communityData?.data || [];
     results.push(...communityItems.map(normalizeCommunityItem));
+  }
+
+  try {
+    const blackCatItems = await fetchBlackCatObjects();
+    results.push(...blackCatItems);
+  } catch (error) {
+    console.warn("BlackCAT no pudo cargarse", error);
   }
 
   try {
