@@ -1,10 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { BlackHoles } from "../components/BlackHoles.jsx";
+import { getBlackHoles } from "../data/blackHoles";
+
+const blackHoles = await getBlackHoles();
 ---
 
 <BaseLayout title="Agujeros negros - Exoteroide">
   <main style="position: relative; z-index: 1;">
-    <BlackHoles client:load />
+    <BlackHoles data={blackHoles} client:load />
   </main>
 </BaseLayout>
