@@ -1,45 +1,67 @@
+export const fallbackBlackHoles = [
+  {
+    id: "sagittarius-a-star",
+    name: "Sagittarius A*",
+    type: "Supermasivo",
+    location: "Centro de la Vía Láctea",
+    distanceLy: 27000,
+    massSolar: 4300000,
+    notes: "Agujero negro supermasivo del centro de nuestra galaxia.",
+    source: "Fallback curado",
+  },
+  {
+    id: "m87-star",
+    name: "M87*",
+    type: "Supermasivo",
+    location: "Galaxia Messier 87",
+    distanceLy: 53500000,
+    massSolar: 6500000000,
+    notes: "Primer agujero negro fotografiado directamente por el Event Horizon Telescope.",
+    source: "Fallback curado",
+  },
+  {
+    id: "ton-618",
+    name: "TON 618",
+    type: "Ultramasivo / cuásar",
+    location: "Cuásar lejano",
+    distanceLy: 10400000000,
+    massSolar: 66000000000,
+    notes: "Uno de los candidatos ultramasivos más famosos.",
+    source: "Fallback curado",
+  },
+  {
+    id: "phoenix-a",
+    name: "Phoenix A",
+    type: "Ultramasivo",
+    location: "Cúmulo Phoenix",
+    distanceLy: 5700000000,
+    massSolar: 100000000000,
+    notes: "Candidato extremadamente masivo en el centro del cúmulo Phoenix.",
+    source: "Fallback curado",
+  },
+  {
+    id: "gaia-bh3",
+    name: "Gaia BH3",
+    type: "Estelar inactivo",
+    location: "Vía Láctea",
+    distanceLy: 1926,
+    massSolar: 33,
+    notes: "Agujero negro estelar inactivo detectado por el movimiento de su estrella compañera.",
+    source: "Fallback curado",
+  },
+  {
+    id: "cygnus-x-1",
+    name: "Cygnus X-1",
+    type: "Estelar / binario de rayos X",
+    location: "Vía Láctea",
+    distanceLy: 7200,
+    massSolar: 21,
+    orbitalPeriodHours: "134.4",
+    notes: "Uno de los primeros candidatos fuertes a agujero negro.",
+    source: "Fallback curado",
+  },
+];
+
 export async function getBlackHoles() {
-  try {
-    // Fuente principal (podés cambiarla después)
-    const res = await fetch("https://raw.githubusercontent.com/OpenExoplanetCatalogue/oec_gzip/master/systems.json");
-
-    const data = await res.json();
-
-    // Transformación simple a tu formato
-    return (data.systems || []).slice(0, 50).map((s, i) => ({
-      name: s.name || `Objeto ${i}`,
-      distance: s.distance || null,
-      mass: null,
-      type: "Desconocido",
-      source: "Dataset externo"
-    }));
-
-  } catch (e) {
-    console.error("Error cargando datos", e);
-
-    // fallback con importantes
-    return [
-      {
-        name: "TON 618",
-        distance: 10400000000,
-        mass: 66000000000,
-        type: "Supermasivo",
-        source: "Curado"
-      },
-      {
-        name: "Sagittarius A*",
-        distance: 26000,
-        mass: 4300000,
-        type: "Supermasivo",
-        source: "Curado"
-      },
-      {
-        name: "M87*",
-        distance: 53000000,
-        mass: 6500000000,
-        type: "Supermasivo",
-        source: "Curado"
-      }
-    ];
-  }
+  return fallbackBlackHoles;
 }
