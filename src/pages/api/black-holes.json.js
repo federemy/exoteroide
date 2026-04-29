@@ -1,4 +1,4 @@
-export const prerender = false;
+export const prerender = true;
 
 const BLACKCAT_URL = "https://www.astro.puc.cl/BlackCAT/transients.php";
 const SIMBAD_TAP_URL = "https://simbad.cds.unistra.fr/simbad/sim-tap/sync";
