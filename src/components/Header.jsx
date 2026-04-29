@@ -33,6 +33,9 @@ export function Header({ className = "" }) {
             <Nav.Link href="/galeria-espacial" className="text-light mx-2">
               📸 Galería Espacial
             </Nav.Link>
+            <Nav.Link href="/agujeros-negros" className="text-light mx-2">
+              🕳️ Agujeros negros
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

@@ -1,0 +1,10 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { BlackHoles } from "../components/BlackHoles.jsx";
+---
+
+<BaseLayout title="Agujeros negros - Exoteroide">
+  <main style="position: relative; z-index: 1;">
+    <BlackHoles client:load />
+  </main>
+</BaseLayout>
